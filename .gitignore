@@ -1,20 +1,9 @@
-# Python
+node_modules/
+.venv/
 __pycache__/
-*.pyc
-env/
-venv/
-
-# AI model (optional if too big, use LFS)
-backend/ai_model/*.pkl
-backend/ai_model/*.h5
-backend/ai_model/*.pt
-
-# Node / frontend build
-frontend/node_modules/
-frontend/dist/
-frontend/build/
-
-# OS / IDE
-.DS_Store
-.vscode/
 *.log
+frontend/build/
+backend/ai_service/*.pkl
+backend/ai_service/*.h5
+backend/ai_service/*.pt
+
