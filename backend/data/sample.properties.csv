@@ -1,0 +1,2 @@
+address,city,state,zipcode,price,beds,baths,sqft,lot_sqft,year_built,property_type,taxes_annual,insurance_annual,hoa_monthly,vacancy_rate,maintenance_pct,management_pct,rent_estimate,other_income,tax_zone,zoning_code,code_violations,foreclosure_flag,lien_flag
+123 Main St,Austin,TX,78701,425000,3,2,1450,5000,1995,SFH,4800,1500,0,0.05,0.05,0.08,2500,100,TX-1,SF-3,0,0,0

@@ -1,0 +1,48 @@
+        score += 1
+    if p.vacancy_rate and p.vacancy_rate > 0.07:
+        score += 1
+    return float(score)
+
+def calc_rrr(coc: float, risk: float) -> float:
+    base = 8.0
+    adj = min(max(risk, 0.0), 10.0) * 0.5
+    return float(base + adj - 0.10 * max(coc, 0.0))
+
+def ai_score(cap_rate: float, coc: float, risk: float, rrr: float) -> float:
+    return float(0.35*cap_rate + 0.45*coc - 0.4*risk - 0.15*rrr)
+
+@app.post("/analyze")
+def analyze(properties: List[Property]):
+    out = []
+    for p in properties:
+        noi = calc_noi(p)
+        cap = calc_cap_rate(noi, p.price)
+        coc = calc_coc(noi, p.price)
+        risk = risk_score(p)
+        rrr = calc_rrr(coc, risk)
+        score = ai_score(cap, coc, risk, rrr)
+        timeline = 12 if risk <= 3 else 24
+        out.append({
+            **p.dict(),
+            "noi": round(noi, 2),
+            "cap_rate": round(cap, 2),
+            "coc": round(coc, 2),
+            "rrr": round(rrr, 2),
+            "risk_score": round(risk, 2),
+            "ai_score": round(score, 2),
+            "timeline_months": timeline
+        })
+    return {"count": len(out), "results": out}
+
+@app.get("/forecast")
+def forecast():
+    # simple synthetic macro and rent index projection for next 12 months
+    today = pd.Timestamp.today().normalize() + pd.offsets.MonthBegin(1)
+    dates = pd.date_range(today, periods=12, freq="MS")
+    base = 100.0
+    trend = np.linspace(0, 3.0, 12)  # ~3% over 12 months
+    season = np.sin(np.linspace(0, 2*np.pi, 12)) * 0.3
+    rent_idx = base + trend + season
+    growth_pct = (rent_idx[-1] - rent_idx[0]) / rent_idx[0] * 100.0
+    points = [{"date": str(d.date()), "rent_index": float(v)} for d, v in zip(dates, rent_idx)]
+    return {"points": points, "total_growth_pct": round(float(growth_pct), 2)}
